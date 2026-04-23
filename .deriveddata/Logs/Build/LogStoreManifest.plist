@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>11</integer>
+	<key>logs</key>
+	<dict>
+		<key>A35482AB-BED0-41D2-9A9B-292B2537CB71</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>A35482AB-BED0-41D2-9A9B-292B2537CB71.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>QuickTranslate project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>QuickTranslate</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project QuickTranslate with scheme QuickTranslate and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>798678719.32497394</real>
+			<key>timeStoppedRecording</key>
+			<real>798678744.86412895</real>
+			<key>title</key>
+			<string>Building project QuickTranslate with scheme QuickTranslate and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>A35482AB-BED0-41D2-9A9B-292B2537CB71</string>
+		</dict>
+		<key>B13F99EE-F197-4FE1-8969-A9C3A75A3EFA</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>B13F99EE-F197-4FE1-8969-A9C3A75A3EFA.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>E</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>3</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>QuickTranslate project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>QuickTranslate</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project QuickTranslate with scheme QuickTranslate and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>798678972.90629196</real>
+			<key>timeStoppedRecording</key>
+			<real>798678976.25413704</real>
+			<key>title</key>
+			<string>Building project QuickTranslate with scheme QuickTranslate and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>B13F99EE-F197-4FE1-8969-A9C3A75A3EFA</string>
+		</dict>
+		<key>E9426189-8B12-4E67-ABBF-0939E3CF89FA</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>E9426189-8B12-4E67-ABBF-0939E3CF89FA.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>QuickTranslate project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>QuickTranslate</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project QuickTranslate with scheme QuickTranslate and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>798679067.32414997</real>
+			<key>timeStoppedRecording</key>
+			<real>798679068.07075596</real>
+			<key>title</key>
+			<string>Building project QuickTranslate with scheme QuickTranslate and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>E9426189-8B12-4E67-ABBF-0939E3CF89FA</string>
+		</dict>
+		<key>FFBCC471-FA89-47C6-8349-3B1D1A3AA40B</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>FFBCC471-FA89-47C6-8349-3B1D1A3AA40B.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>QuickTranslate project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>QuickTranslate</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Cleaning project QuickTranslate with scheme QuickTranslate and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>798679066.74508095</real>
+			<key>timeStoppedRecording</key>
+			<real>798679067.31797397</real>
+			<key>title</key>
+			<string>Cleaning project QuickTranslate with scheme QuickTranslate and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>FFBCC471-FA89-47C6-8349-3B1D1A3AA40B</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
