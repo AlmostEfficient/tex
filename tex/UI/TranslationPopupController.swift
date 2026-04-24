@@ -3,57 +3,83 @@ import SwiftUI
 
 @MainActor
 final class TranslationPopupController {
+    private static let autoDismissDelay: Duration = .seconds(15)
+
     fileprivate struct PopupPayload {
+        enum Content {
+            case loading(message: String)
+            case markdown(String)
+        }
+
         let title: String
-        let markdown: String
+        let content: Content
         let footnote: String
         let accentColor: Color
     }
 
     private var panel: NSPanel?
+    private var autoDismissTask: Task<Void, Never>?
 
     func present(record: TranslationRecord) {
         present(
             payload: PopupPayload(
                 title: "Formatted Translation",
-                markdown: record.markdown,
+                content: .markdown(record.markdown),
                 footnote: record.modelName,
                 accentColor: Color(red: 0.34, green: 0.75, blue: 0.50)
             )
         )
+        scheduleAutoDismiss()
+    }
+
+    func presentLoading() {
+        present(
+            payload: PopupPayload(
+                title: "Formatting Translation",
+                content: .loading(message: "Sending your screenshot to Gemini and preparing the result."),
+                footnote: "Gemini request in progress",
+                accentColor: Color(red: 0.98, green: 0.72, blue: 0.29)
+            )
+        )
+        cancelAutoDismiss()
     }
 
     func presentError(_ message: String) {
         present(
             payload: PopupPayload(
                 title: "tex",
-                markdown: message,
+                content: .markdown(message),
                 footnote: "Gemini request failed",
                 accentColor: Color(red: 0.98, green: 0.47, blue: 0.39)
             )
         )
+        cancelAutoDismiss()
     }
 
     func dismiss() {
+        cancelAutoDismiss()
         panel?.orderOut(nil)
     }
 
     private func present(payload: PopupPayload) {
         let panel = panel ?? makePanel()
+        (panel as? PopupPanel)?.onClose = { [weak self] in
+            self?.dismiss()
+        }
         panel.contentView = NSHostingView(
             rootView: TranslationPopupCard(payload: payload) { [weak self] in
                 self?.dismiss()
             }
         )
         position(panel)
-        panel.orderFrontRegardless()
+        panel.makeKeyAndOrderFront(nil)
         self.panel = panel
     }
 
     private func makePanel() -> NSPanel {
-        let panel = NSPanel(
+        let panel = PopupPanel(
             contentRect: NSRect(x: 0, y: 0, width: 460, height: 340),
-            styleMask: [.borderless, .nonactivatingPanel],
+            styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
@@ -78,6 +104,47 @@ final class TranslationPopupController {
         )
 
         panel.setFrameOrigin(origin)
+    }
+
+    private func scheduleAutoDismiss() {
+        cancelAutoDismiss()
+        autoDismissTask = Task { [weak self] in
+            try? await Task.sleep(for: Self.autoDismissDelay)
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                self?.dismiss()
+            }
+        }
+    }
+
+    private func cancelAutoDismiss() {
+        autoDismissTask?.cancel()
+        autoDismissTask = nil
+    }
+}
+
+private final class PopupPanel: NSPanel {
+    var onClose: (() -> Void)?
+
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { false }
+
+    override func cancelOperation(_ sender: Any?) {
+        onClose?()
+    }
+
+    override func performClose(_ sender: Any?) {
+        onClose?()
+    }
+
+    override func keyDown(with event: NSEvent) {
+        if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command],
+           event.charactersIgnoringModifiers?.lowercased() == "w" {
+            onClose?()
+            return
+        }
+
+        super.keyDown(with: event)
     }
 }
 
@@ -106,12 +173,14 @@ private struct TranslationPopupCard: View {
 
                 Spacer()
 
-                Button(action: copyMarkdown) {
-                    Text("Copy")
-                        .font(.system(size: 11, weight: .semibold))
+                if case .markdown = payload.content {
+                    Button(action: copyMarkdown) {
+                        Text("Copy")
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.white.opacity(0.78))
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(.white.opacity(0.78))
 
                 Button(action: onDismiss) {
                     Image(systemName: "xmark")
@@ -121,15 +190,7 @@ private struct TranslationPopupCard: View {
                 .foregroundStyle(.white.opacity(0.72))
             }
 
-            ScrollView {
-                Text(markdownBody)
-                    .font(.system(size: 15))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
-                    .multilineTextAlignment(.leading)
-                    .padding(.trailing, 4)
-            }
+            contentView
         }
         .padding(16)
         .frame(width: 460, height: 340, alignment: .leading)
@@ -143,20 +204,121 @@ private struct TranslationPopupCard: View {
         )
     }
 
-    private var markdownBody: AttributedString {
+    @ViewBuilder
+    private var contentView: some View {
+        switch payload.content {
+        case .loading(let message):
+            VStack(alignment: .leading, spacing: 16) {
+                Spacer(minLength: 0)
+
+                HStack(spacing: 12) {
+                    ProgressView()
+                        .controlSize(.regular)
+                        .tint(.white)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Working on it")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(.white)
+
+                        Text(message)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.68))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(18)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.white.opacity(0.06))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                        )
+                )
+
+                Spacer(minLength: 0)
+            }
+        case .markdown(let markdown):
+            ScrollView {
+                SelectableMarkdownTextView(markdown: markdownBody(markdown))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.trailing, 4)
+            }
+        }
+    }
+
+    private func markdownBody(_ markdown: String) -> AttributedString {
         do {
             return try AttributedString(
-                markdown: payload.markdown,
+                markdown: markdown,
                 options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
             )
         } catch {
-            return AttributedString(payload.markdown)
+            return AttributedString(markdown)
         }
     }
 
     private func copyMarkdown() {
+        guard case .markdown(let markdown) = payload.content else {
+            return
+        }
+
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(payload.markdown, forType: .string)
+        pasteboard.setString(markdown, forType: .string)
+    }
+}
+
+private struct SelectableMarkdownTextView: NSViewRepresentable {
+    let markdown: AttributedString
+
+    func makeNSView(context: Context) -> NSScrollView {
+        let scrollView = NSScrollView()
+        scrollView.drawsBackground = false
+        scrollView.borderType = .noBorder
+        scrollView.hasVerticalScroller = false
+        scrollView.hasHorizontalScroller = false
+        scrollView.autohidesScrollers = true
+
+        let textView = NSTextView()
+        textView.drawsBackground = false
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.textContainerInset = NSSize(width: 0, height: 0)
+        textView.textContainer?.lineFragmentPadding = 0
+        textView.textContainer?.widthTracksTextView = true
+        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = false
+        textView.autoresizingMask = [.width]
+        textView.textColor = .white
+        textView.font = .systemFont(ofSize: 15)
+
+        scrollView.documentView = textView
+        update(textView: textView)
+
+        return scrollView
+    }
+
+    func updateNSView(_ scrollView: NSScrollView, context: Context) {
+        guard let textView = scrollView.documentView as? NSTextView else {
+            return
+        }
+
+        update(textView: textView)
+    }
+
+    private func update(textView: NSTextView) {
+        let mutable = NSMutableAttributedString(markdown)
+        let fullRange = NSRange(location: 0, length: mutable.length)
+        mutable.addAttributes(
+            [
+                .foregroundColor: NSColor.white,
+                .font: NSFont.systemFont(ofSize: 15)
+            ],
+            range: fullRange
+        )
+        textView.textStorage?.setAttributedString(mutable)
     }
 }

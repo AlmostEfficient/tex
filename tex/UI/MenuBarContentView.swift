@@ -193,17 +193,25 @@ private struct HistoryCard: View {
     }()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(record.previewText)
-                        .font(.system(size: 14, weight: .semibold))
-                        .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(record.previewText)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.primary)
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
 
-                    Text(record.modelName)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.secondary)
-                }
+            HStack(alignment: .center) {
+                Text(record.modelName)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+
+                Text("•")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.tertiary)
+
+                Text(Self.relativeFormatter.localizedString(for: record.capturedAt, relativeTo: .now))
+                    .font(.system(size: 11))
+                    .foregroundStyle(.tertiary)
 
                 Spacer()
 
@@ -217,15 +225,6 @@ private struct HistoryCard: View {
                         .font(.system(size: 11, weight: .semibold))
                 }
             }
-
-            Text(record.previewText)
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .lineLimit(3)
-
-            Text(Self.relativeFormatter.localizedString(for: record.capturedAt, relativeTo: .now))
-                .font(.system(size: 11))
-                .foregroundStyle(.tertiary)
         }
         .padding(12)
         .background(

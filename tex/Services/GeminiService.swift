@@ -18,9 +18,31 @@ enum GeminiServiceError: LocalizedError {
 }
 
 struct GeminiService {
-    let modelName = "gemini-2.5-flash"
+    let modelName = "gemini-2.5-flash-lite"
+    private let maxAttempts = 3
 
     func translateImage(data: Data, mimeType: String, apiKey: String) async throws -> String {
+        var lastError: Error?
+
+        for attempt in 1...maxAttempts {
+            do {
+                return try await performTranslationRequest(data: data, mimeType: mimeType, apiKey: apiKey)
+            } catch {
+                lastError = error
+
+                guard attempt < maxAttempts, shouldRetry(after: error) else {
+                    throw error
+                }
+
+                let backoffSeconds = Double(attempt)
+                try await Task.sleep(for: .seconds(backoffSeconds))
+            }
+        }
+
+        throw lastError ?? GeminiServiceError.invalidResponse
+    }
+
+    private func performTranslationRequest(data: Data, mimeType: String, apiKey: String) async throws -> String {
         let requestBody = GenerateContentRequest(
             contents: [
                 Content(
@@ -79,6 +101,24 @@ struct GeminiService {
         }
 
         return stripCodeFences(from: text)
+    }
+
+    private func shouldRetry(after error: Error) -> Bool {
+        guard let geminiError = error as? GeminiServiceError else {
+            return false
+        }
+
+        switch geminiError {
+        case .apiError(let message):
+            let normalized = message.lowercased()
+            return normalized.contains("high demand")
+                || normalized.contains("try again later")
+                || normalized.contains("temporar")
+                || normalized.contains("unavailable")
+                || normalized.contains("resource exhausted")
+        default:
+            return false
+        }
     }
 
     private func stripCodeFences(from text: String) -> String {

@@ -115,6 +115,7 @@ final class AppController: ObservableObject {
             }
 
             processingState = .sendingToGemini
+            popupController.presentLoading()
             let markdown = try await geminiService.translateImage(
                 data: capturedImage.data,
                 mimeType: capturedImage.mimeType,
