@@ -1,6 +1,5 @@
 import AppKit
 import Foundation
-import Translation
 
 @MainActor
 final class AppController: ObservableObject {
@@ -9,8 +8,7 @@ final class AppController: ObservableObject {
     enum ProcessingState: Equatable {
         case idle
         case capturing
-        case recognizing
-        case translating
+        case sendingToGemini
 
         var label: String {
             switch self {
@@ -18,32 +16,33 @@ final class AppController: ObservableObject {
                 return "Ready"
             case .capturing:
                 return "Capturing selection"
-            case .recognizing:
-                return "Recognizing text"
-            case .translating:
-                return "Translating to English"
+            case .sendingToGemini:
+                return "Formatting translation"
+            }
+        }
+
+        var accentColor: NSColor {
+            switch self {
+            case .idle:
+                return NSColor(calibratedRed: 0.34, green: 0.75, blue: 0.50, alpha: 1)
+            case .capturing:
+                return NSColor(calibratedRed: 0.25, green: 0.62, blue: 0.96, alpha: 1)
+            case .sendingToGemini:
+                return NSColor(calibratedRed: 0.98, green: 0.72, blue: 0.29, alpha: 1)
             }
         }
     }
 
-    struct PendingTranslation: Identifiable, Equatable {
-        let id: UUID
-        let sourceText: String
-        let createdAt: Date
-    }
-
     @Published private(set) var processingState: ProcessingState = .idle
     @Published private(set) var captureInFlight = false
-    @Published private(set) var pendingQueue: [PendingTranslation] = []
-    @Published var translationConfiguration: TranslationSession.Configuration?
+    @Published private(set) var hasAPIKey = false
 
     let historyStore = TranslationHistoryStore()
     let popupController = TranslationPopupController()
 
     private let captureService = ScreenCaptureService()
-    private let ocrService = OCRService()
-
-    private var activeTranslation: PendingTranslation?
+    private let geminiService = GeminiService()
+    private let secretsStore = SecretsStore()
     private var hotKeyRegistered = false
 
     private init() {
@@ -56,22 +55,28 @@ final class AppController: ObservableObject {
                 self?.reregisterHotKey()
             }
         }
+
+        refreshConfigurationState()
     }
 
     var hotKeyLabel: String {
         HotKeyMonitor.shortcutDescription
     }
 
+    var currentModelName: String {
+        geminiService.modelName
+    }
+
     private func reregisterHotKey() {
         HotKeyMonitor.shared.reregister {
             Task { @MainActor in
-                await self.captureAndTranslateFromHotKey()
+                await self.captureAndTranslate()
             }
         }
     }
 
-    var currentPendingTranslation: PendingTranslation? {
-        activeTranslation
+    var latestRecord: TranslationRecord? {
+        historyStore.records.first
     }
 
     func start() {
@@ -80,70 +85,55 @@ final class AppController: ObservableObject {
         hotKeyRegistered = true
         HotKeyMonitor.shared.register {
             Task { @MainActor in
-                await self.captureAndTranslateFromHotKey()
+                await self.captureAndTranslate()
             }
         }
     }
 
-    func captureAndTranslateFromHotKey() async {
+    func captureAndTranslate() async {
         guard !captureInFlight else { return }
+
+        guard let apiKey = geminiAPIKey(), !apiKey.isEmpty else {
+            popupController.presentError("Add your Gemini API key in Settings before translating.")
+            refreshConfigurationState()
+            return
+        }
+
+        guard ensureScreenCaptureAccess() else {
+            popupController.presentError("Screen Recording permission is required before capturing.")
+            return
+        }
 
         captureInFlight = true
         processingState = .capturing
 
         do {
-            guard let imageURL = try await captureService.captureSelection() else {
-                processingState = activeTranslation == nil && pendingQueue.isEmpty ? .idle : .translating
+            guard let capturedImage = try await captureService.captureSelection() else {
+                processingState = .idle
                 captureInFlight = false
                 return
             }
 
-            processingState = .recognizing
-            let recognizedText = try await ocrService.recognizeText(in: imageURL)
-            try? FileManager.default.removeItem(at: imageURL)
-
-            pendingQueue.append(
-                PendingTranslation(
-                    id: UUID(),
-                    sourceText: recognizedText,
-                    createdAt: .now
-                )
+            processingState = .sendingToGemini
+            let markdown = try await geminiService.translateImage(
+                data: capturedImage.data,
+                mimeType: capturedImage.mimeType,
+                apiKey: apiKey
             )
-            captureInFlight = false
-            pumpTranslationQueue()
-        } catch let error as OCRServiceError {
-            processingState = activeTranslation == nil && pendingQueue.isEmpty ? .idle : .translating
-            captureInFlight = false
-            popupController.presentError(error.localizedDescription)
+
+            let record = TranslationRecord(
+                markdown: markdown,
+                capturedAt: .now,
+                modelName: geminiService.modelName
+            )
+            historyStore.add(record)
+            popupController.present(record: record)
         } catch {
-            processingState = activeTranslation == nil && pendingQueue.isEmpty ? .idle : .translating
-            captureInFlight = false
             popupController.presentError(error.localizedDescription)
         }
-    }
 
-    func completeTranslation(
-        _ pending: PendingTranslation,
-        translatedText: String,
-        sourceLanguage: String,
-        targetLanguage: String
-    ) {
-        let record = TranslationRecord(
-            sourceText: pending.sourceText,
-            translatedText: translatedText,
-            capturedAt: pending.createdAt,
-            sourceLanguage: sourceLanguage,
-            targetLanguage: targetLanguage
-        )
-
-        historyStore.add(record)
-        popupController.present(record: record)
-        finishTranslation(for: pending)
-    }
-
-    func failTranslation(_ pending: PendingTranslation, message: String) {
-        popupController.presentError(message)
-        finishTranslation(for: pending)
+        processingState = .idle
+        captureInFlight = false
     }
 
     func clearHistory() {
@@ -156,41 +146,39 @@ final class AppController: ObservableObject {
         pasteboard.setString(text, forType: .string)
     }
 
-    func localizedLanguageName(for identifier: String?) -> String {
-        guard let identifier, !identifier.isEmpty else {
-            return "Auto"
-        }
+    func refreshConfigurationState() {
+        hasAPIKey = !(geminiAPIKey()?.isEmpty ?? true)
+    }
 
-        let locale = Locale.current
-        return locale.localizedString(forIdentifier: identifier) ?? identifier
+    func geminiAPIKey() -> String? {
+        try? secretsStore.loadGeminiAPIKey()
+    }
+
+    func saveGeminiAPIKey(_ apiKey: String) -> String? {
+        let trimmed = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        do {
+            if trimmed.isEmpty {
+                try secretsStore.deleteGeminiAPIKey()
+            } else {
+                try secretsStore.saveGeminiAPIKey(trimmed)
+            }
+            refreshConfigurationState()
+            return nil
+        } catch {
+            return error.localizedDescription
+        }
     }
 
     func quit() {
         NSApplication.shared.terminate(nil)
     }
 
-    private func pumpTranslationQueue() {
-        guard activeTranslation == nil else { return }
-        guard !pendingQueue.isEmpty else {
-            processingState = captureInFlight ? .capturing : .idle
-            return
+    private func ensureScreenCaptureAccess() -> Bool {
+        if CGPreflightScreenCaptureAccess() {
+            return true
         }
 
-        activeTranslation = pendingQueue.removeFirst()
-        processingState = .translating
-        translationConfiguration = TranslationSession.Configuration(
-            source: nil,
-            target: Locale.Language(identifier: "en")
-        )
-    }
-
-    private func finishTranslation(for pending: PendingTranslation) {
-        if activeTranslation?.id == pending.id {
-            activeTranslation = nil
-            translationConfiguration = nil
-            processingState = captureInFlight ? .capturing : .idle
-        }
-
-        pumpTranslationQueue()
+        return CGRequestScreenCaptureAccess()
     }
 }

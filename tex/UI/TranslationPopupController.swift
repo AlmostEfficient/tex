@@ -5,20 +5,19 @@ import SwiftUI
 final class TranslationPopupController {
     fileprivate struct PopupPayload {
         let title: String
-        let body: String
-        let footnote: String?
+        let markdown: String
+        let footnote: String
         let accentColor: Color
     }
 
     private var panel: NSPanel?
-    private var autoDismissTask: Task<Void, Never>?
 
     func present(record: TranslationRecord) {
         present(
             payload: PopupPayload(
-                title: "Translated to English",
-                body: record.translatedText,
-                footnote: excerpt(for: record.sourceText),
+                title: "Formatted Translation",
+                markdown: record.markdown,
+                footnote: record.modelName,
                 accentColor: Color(red: 0.34, green: 0.75, blue: 0.50)
             )
         )
@@ -28,16 +27,14 @@ final class TranslationPopupController {
         present(
             payload: PopupPayload(
                 title: "tex",
-                body: message,
-                footnote: nil,
+                markdown: message,
+                footnote: "Gemini request failed",
                 accentColor: Color(red: 0.98, green: 0.47, blue: 0.39)
             )
         )
     }
 
     func dismiss() {
-        autoDismissTask?.cancel()
-        autoDismissTask = nil
         panel?.orderOut(nil)
     }
 
@@ -51,20 +48,11 @@ final class TranslationPopupController {
         position(panel)
         panel.orderFrontRegardless()
         self.panel = panel
-
-        autoDismissTask?.cancel()
-        autoDismissTask = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(10))
-            guard !Task.isCancelled else { return }
-            await MainActor.run {
-                self?.dismiss()
-            }
-        }
     }
 
     private func makePanel() -> NSPanel {
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 360, height: 184),
+            contentRect: NSRect(x: 0, y: 0, width: 460, height: 340),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -80,8 +68,7 @@ final class TranslationPopupController {
     }
 
     private func position(_ panel: NSPanel) {
-        let mouseLocation = NSEvent.mouseLocation
-        let screen = NSScreen.screens.first(where: { NSMouseInRect(mouseLocation, $0.frame, false) }) ?? NSScreen.main
+        let screen = NSScreen.main
         let visibleFrame = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
 
         let panelSize = panel.frame.size
@@ -92,18 +79,6 @@ final class TranslationPopupController {
 
         panel.setFrameOrigin(origin)
     }
-
-    private func excerpt(for text: String) -> String {
-        let singleLine = text
-            .replacingOccurrences(of: "\n", with: " ")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-
-        if singleLine.count <= 140 {
-            return singleLine
-        }
-
-        return String(singleLine.prefix(140)) + "..."
-    }
 }
 
 private struct TranslationPopupCard: View {
@@ -112,37 +87,52 @@ private struct TranslationPopupCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                Circle()
-                    .fill(payload.accentColor)
-                    .frame(width: 10, height: 10)
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                HStack(spacing: 10) {
+                    Circle()
+                        .fill(payload.accentColor)
+                        .frame(width: 10, height: 10)
 
-                Text(payload.title)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(payload.title)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.white)
+
+                        Text(payload.footnote)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+                }
 
                 Spacer()
 
-                Image(systemName: "xmark")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.72))
+                Button(action: copyMarkdown) {
+                    Text("Copy")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.white.opacity(0.78))
+
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 11, weight: .bold))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.white.opacity(0.72))
             }
 
-            Text(payload.body)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(.white)
-                .lineLimit(4)
-                .multilineTextAlignment(.leading)
-
-            if let footnote = payload.footnote, !footnote.isEmpty {
-                Text(footnote)
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundStyle(.white.opacity(0.68))
-                    .lineLimit(2)
+            ScrollView {
+                Text(markdownBody)
+                    .font(.system(size: 15))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+                    .multilineTextAlignment(.leading)
+                    .padding(.trailing, 4)
             }
         }
         .padding(16)
-        .frame(width: 360, alignment: .leading)
+        .frame(width: 460, height: 340, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(Color.black.opacity(0.88))
@@ -151,6 +141,22 @@ private struct TranslationPopupCard: View {
                         .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
                 )
         )
-        .onTapGesture(perform: onDismiss)
+    }
+
+    private var markdownBody: AttributedString {
+        do {
+            return try AttributedString(
+                markdown: payload.markdown,
+                options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+            )
+        } catch {
+            return AttributedString(payload.markdown)
+        }
+    }
+
+    private func copyMarkdown() {
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(payload.markdown, forType: .string)
     }
 }

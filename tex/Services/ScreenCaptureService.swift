@@ -1,7 +1,12 @@
 import Foundation
 
 struct ScreenCaptureService {
-    func captureSelection() async throws -> URL? {
+    struct CapturedImage {
+        let data: Data
+        let mimeType: String
+    }
+
+    func captureSelection() async throws -> CapturedImage? {
         let destinationURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("quick-translate-\(UUID().uuidString)")
             .appendingPathExtension("png")
@@ -12,10 +17,25 @@ struct ScreenCaptureService {
 
         return try await withCheckedThrowingContinuation { continuation in
             process.terminationHandler = { _ in
-                if FileManager.default.fileExists(atPath: destinationURL.path) {
-                    continuation.resume(returning: destinationURL)
-                } else {
+                guard FileManager.default.fileExists(atPath: destinationURL.path) else {
                     continuation.resume(returning: nil)
+                    return
+                }
+
+                defer {
+                    try? FileManager.default.removeItem(at: destinationURL)
+                }
+
+                do {
+                    let data = try Data(contentsOf: destinationURL)
+                    continuation.resume(
+                        returning: CapturedImage(
+                            data: data,
+                            mimeType: "image/png"
+                        )
+                    )
+                } catch {
+                    continuation.resume(throwing: error)
                 }
             }
 

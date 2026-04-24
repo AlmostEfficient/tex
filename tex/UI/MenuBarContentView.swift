@@ -2,12 +2,24 @@ import SwiftUI
 
 struct MenuBarContentView: View {
     @EnvironmentObject private var appController: AppController
+    @Environment(\.openWindow) private var openWindow
+
+    private let settingsWindowID = "settings-window"
+
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "v\(version) (\(build))"
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
             statusRow
+            apiKeyRow
             shortcutRow
+            Divider()
+            captureRow
             Divider()
             historySection
             Divider()
@@ -17,12 +29,24 @@ struct MenuBarContentView: View {
         .frame(width: 420)
     }
 
-    private var header: some View {
+private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("tex")
-                .font(.system(size: 20, weight: .semibold))
+            HStack(spacing: 8) {
+                Text("tex")
+                    .font(.system(size: 20, weight: .semibold))
 
-            Text("Capture any screen region and translate detected text into English.")
+                Text(appVersion)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .fill(Color.secondary.opacity(0.12))
+                    )
+            }
+
+            Text("Capture a screen region and send it directly to Gemini 1.5 Flash for formatted translation.")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
         }
@@ -38,12 +62,20 @@ struct MenuBarContentView: View {
                 .font(.system(size: 13, weight: .medium))
 
             Spacer()
+        }
+    }
 
-            if !appController.pendingQueue.isEmpty {
-                Text("\(appController.pendingQueue.count) queued")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.secondary)
-            }
+    private var apiKeyRow: some View {
+        HStack {
+            Text("Gemini API")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(.secondary)
+
+            Spacer()
+
+            Text(appController.hasAPIKey ? "Configured" : "Missing")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(appController.hasAPIKey ? .green : .red)
         }
     }
 
@@ -59,13 +91,32 @@ struct MenuBarContentView: View {
         }
     }
 
+    private var captureRow: some View {
+        Button {
+            Task {
+                await appController.captureAndTranslate()
+            }
+        } label: {
+            HStack {
+                Image(systemName: "sparkles.rectangle.stack")
+                Text("Translate Selected Area")
+                Spacer()
+                Text(appController.currentModelName)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(appController.captureInFlight)
+    }
+
     private var historySection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("History")
+            Text("Recent Results")
                 .font(.system(size: 13, weight: .semibold))
 
             if appController.historyStore.records.isEmpty {
-                Text("No translations yet. Use the shortcut to capture an area of the screen.")
+                Text("No translations yet. Use the shortcut or the button above to capture a region.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 20)
@@ -75,10 +126,11 @@ struct MenuBarContentView: View {
                         ForEach(appController.historyStore.records) { record in
                             HistoryCard(
                                 record: record,
-                                sourceLanguage: appController.localizedLanguageName(for: record.sourceLanguage),
-                                targetLanguage: appController.localizedLanguageName(for: record.targetLanguage),
                                 onCopy: {
-                                    appController.copy(record.translatedText)
+                                    appController.copy(record.markdown)
+                                },
+                                onShow: {
+                                    appController.popupController.present(record: record)
                                 }
                             )
                         }
@@ -100,6 +152,16 @@ struct MenuBarContentView: View {
 
             Spacer()
 
+            Button("Settings…") {
+                openWindow(id: settingsWindowID)
+                NSApp.activate(ignoringOtherApps: true)
+            }
+            .buttonStyle(.link)
+            .keyboardShortcut(",", modifiers: .command)
+
+            Divider()
+                .frame(height: 16)
+
             Button("Quit") {
                 appController.quit()
             }
@@ -113,9 +175,7 @@ struct MenuBarContentView: View {
             return Color(red: 0.34, green: 0.75, blue: 0.50)
         case .capturing:
             return Color(red: 0.25, green: 0.62, blue: 0.96)
-        case .recognizing:
-            return Color(red: 0.98, green: 0.72, blue: 0.29)
-        case .translating:
+        case .sendingToGemini:
             return Color(red: 0.90, green: 0.51, blue: 0.24)
         }
     }
@@ -123,9 +183,8 @@ struct MenuBarContentView: View {
 
 private struct HistoryCard: View {
     let record: TranslationRecord
-    let sourceLanguage: String
-    let targetLanguage: String
     let onCopy: () -> Void
+    let onShow: () -> Void
 
     private static let relativeFormatter: RelativeDateTimeFormatter = {
         let formatter = RelativeDateTimeFormatter()
@@ -137,23 +196,29 @@ private struct HistoryCard: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(record.translatedText)
+                    Text(record.previewText)
                         .font(.system(size: 14, weight: .semibold))
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Text("\(sourceLanguage) → \(targetLanguage)")
+                    Text(record.modelName)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.secondary)
                 }
 
                 Spacer()
 
-                Button("Copy", action: onCopy)
-                    .buttonStyle(.borderless)
-                    .font(.system(size: 11, weight: .semibold))
+                HStack(spacing: 10) {
+                    Button("Show", action: onShow)
+                        .buttonStyle(.borderless)
+                        .font(.system(size: 11, weight: .semibold))
+
+                    Button("Copy", action: onCopy)
+                        .buttonStyle(.borderless)
+                        .font(.system(size: 11, weight: .semibold))
+                }
             }
 
-            Text(record.sourceText)
+            Text(record.previewText)
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
                 .lineLimit(3)
@@ -167,5 +232,17 @@ private struct HistoryCard: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(Color.secondary.opacity(0.08))
         )
+    }
+}
+
+private extension TranslationRecord {
+    var previewText: String {
+        markdown
+            .replacingOccurrences(of: "#", with: "")
+            .replacingOccurrences(of: "*", with: "")
+            .replacingOccurrences(of: "_", with: "")
+            .replacingOccurrences(of: "`", with: "")
+            .replacingOccurrences(of: "\n", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

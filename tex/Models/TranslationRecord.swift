@@ -2,25 +2,19 @@ import Foundation
 
 struct TranslationRecord: Codable, Hashable, Identifiable {
     let id: UUID
-    let sourceText: String
-    let translatedText: String
+    let markdown: String
     let capturedAt: Date
-    let sourceLanguage: String?
-    let targetLanguage: String
+    let modelName: String
 
     init(
         id: UUID = UUID(),
-        sourceText: String,
-        translatedText: String,
+        markdown: String,
         capturedAt: Date = .now,
-        sourceLanguage: String?,
-        targetLanguage: String
+        modelName: String
     ) {
         self.id = id
-        self.sourceText = sourceText
-        self.translatedText = translatedText
+        self.markdown = markdown
         self.capturedAt = capturedAt
-        self.sourceLanguage = sourceLanguage
-        self.targetLanguage = targetLanguage
+        self.modelName = modelName
     }
 }

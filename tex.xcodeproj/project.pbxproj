@@ -7,38 +7,43 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-	A00000010000000000000001 /* texApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000001 /* texApp.swift */; };
-	A00000010000000000000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000002 /* AppDelegate.swift */; };
-	A00000010000000000000003 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000003 /* AppController.swift */; };
-	A00000010000000000000004 /* TranslationRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000004 /* TranslationRecord.swift */; };
-	A00000010000000000000005 /* TranslationHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000005 /* TranslationHistoryStore.swift */; };
-	A00000010000000000000006 /* ScreenCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000006 /* ScreenCaptureService.swift */; };
-	A00000010000000000000007 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000007 /* OCRService.swift */; };
-	A00000010000000000000008 /* HotKeyMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000008 /* HotKeyMonitor.swift */; };
-	A00000010000000000000009 /* TranslationPopupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000009 /* TranslationPopupController.swift */; };
-	A0000001000000000000000A /* TranslationWorkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000A /* TranslationWorkerView.swift */; };
-	A0000001000000000000000B /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000B /* MenuBarContentView.swift */; };
-	A0000001000000000000000C /* ShortcutPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000C /* ShortcutPreference.swift */; };
-	A0000001000000000000000D /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000D /* ShortcutRecorderView.swift */; };
+		A00000010000000000000001 /* texApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000001 /* texApp.swift */; };
+		A00000010000000000000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000002 /* AppDelegate.swift */; };
+		A00000010000000000000003 /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000003 /* AppController.swift */; };
+		A00000010000000000000004 /* TranslationRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000004 /* TranslationRecord.swift */; };
+		A00000010000000000000005 /* TranslationHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000005 /* TranslationHistoryStore.swift */; };
+		A00000010000000000000006 /* ScreenCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000006 /* ScreenCaptureService.swift */; };
+		A00000010000000000000007 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000007 /* OCRService.swift */; };
+		A00000010000000000000008 /* HotKeyMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000008 /* HotKeyMonitor.swift */; };
+		A00000010000000000000009 /* TranslationPopupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000009 /* TranslationPopupController.swift */; };
+		A0000001000000000000000A /* TranslationWorkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000A /* TranslationWorkerView.swift */; };
+		A0000001000000000000000B /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000B /* MenuBarContentView.swift */; };
+		A0000001000000000000000C /* ShortcutPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000C /* ShortcutPreference.swift */; };
+		A0000001000000000000000D /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000D /* ShortcutRecorderView.swift */; };
+		A0000001000000000000000E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000E /* SettingsView.swift */; };
+		A0000001000000000000000F /* GeminiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000011000000000000000F /* GeminiService.swift */; };
+		A00000010000000000000010 /* SecretsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000110000000000000010 /* SecretsStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-	A00000100000000000000001 /* tex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tex.app; sourceTree = BUILT_PRODUCTS_DIR; };
-	A00000100000000000000002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = tex/Info.plist; sourceTree = SOURCE_ROOT; };
-	A00000110000000000000001 /* texApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = texApp.swift; sourceTree = "<group>"; };
-	A00000110000000000000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-	A00000110000000000000003 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
-	A00000110000000000000004 /* TranslationRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationRecord.swift; sourceTree = "<group>"; };
-	A00000110000000000000005 /* TranslationHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationHistoryStore.swift; sourceTree = "<group>"; };
-	A00000110000000000000006 /* ScreenCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCaptureService.swift; sourceTree = "<group>"; };
-	A00000110000000000000007 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
-	A00000110000000000000008 /* HotKeyMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyMonitor.swift; sourceTree = "<group>"; };
-	A00000110000000000000009 /* TranslationPopupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPopupController.swift; sourceTree = "<group>"; };
-	A0000011000000000000000A /* TranslationWorkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationWorkerView.swift; sourceTree = "<group>"; };
-	A0000011000000000000000B /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
+		A00000100000000000000001 /* tex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tex.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000100000000000000002 /* tex/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = tex/Info.plist; sourceTree = SOURCE_ROOT; };
+		A00000110000000000000001 /* texApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = texApp.swift; sourceTree = "<group>"; };
+		A00000110000000000000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A00000110000000000000003 /* AppController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
+		A00000110000000000000004 /* TranslationRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationRecord.swift; sourceTree = "<group>"; };
+		A00000110000000000000005 /* TranslationHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationHistoryStore.swift; sourceTree = "<group>"; };
+		A00000110000000000000006 /* ScreenCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCaptureService.swift; sourceTree = "<group>"; };
+		A00000110000000000000007 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
+		A00000110000000000000008 /* HotKeyMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyMonitor.swift; sourceTree = "<group>"; };
+		A00000110000000000000009 /* TranslationPopupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPopupController.swift; sourceTree = "<group>"; };
+		A0000011000000000000000A /* TranslationWorkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationWorkerView.swift; sourceTree = "<group>"; };
+		A0000011000000000000000B /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
 		A0000011000000000000000C /* ShortcutPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutPreference.swift; sourceTree = "<group>"; };
 		A0000011000000000000000D /* ShortcutRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderView.swift; sourceTree = "<group>"; };
 		A0000011000000000000000E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A0000011000000000000000F /* GeminiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiService.swift; sourceTree = "<group>"; };
+		A00000110000000000000010 /* SecretsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretsStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,7 +73,7 @@
 				A00000300000000000000006 /* Models */,
 				A00000300000000000000007 /* Services */,
 				A00000300000000000000008 /* UI */,
-				A00000100000000000000002 /* Info.plist */,
+				A00000100000000000000002 /* tex/Info.plist */,
 			);
 			path = tex;
 			sourceTree = SOURCE_ROOT;
@@ -110,6 +115,8 @@
 			isa = PBXGroup;
 			children = (
 				A0000011000000000000000C /* ShortcutPreference.swift */,
+				A0000011000000000000000F /* GeminiService.swift */,
+				A00000110000000000000010 /* SecretsStore.swift */,
 				A00000110000000000000005 /* TranslationHistoryStore.swift */,
 				A00000110000000000000006 /* ScreenCaptureService.swift */,
 				A00000110000000000000007 /* OCRService.swift */,
@@ -173,6 +180,7 @@
 				Base,
 			);
 			mainGroup = A00000300000000000000001;
+			preferredProjectObjectVersion = 77;
 			productRefGroup = A00000300000000000000003 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -193,27 +201,29 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-	A000002000000000000002 /* Sources */ = {
-		isa = PBXSourcesBuildPhase;
-		buildActionMask = 2147483647;
-		files = (
-			A00000010000000000000001 /* texApp.swift in Sources */,
-			A00000010000000000000002 /* AppDelegate.swift in Sources */,
-			A00000010000000000000003 /* AppController.swift in Sources */,
-			A00000010000000000000004 /* TranslationRecord.swift in Sources */,
-			A00000010000000000000005 /* TranslationHistoryStore.swift in Sources */,
-			A00000010000000000000006 /* ScreenCaptureService.swift in Sources */,
-			A00000010000000000000007 /* OCRService.swift in Sources */,
-			A00000010000000000000008 /* HotKeyMonitor.swift in Sources */,
-			A00000010000000000000009 /* TranslationPopupController.swift in Sources */,
-			A0000001000000000000000A /* TranslationWorkerView.swift in Sources */,
-			A0000001000000000000000B /* MenuBarContentView.swift in Sources */,
-			A0000001000000000000000C /* ShortcutPreference.swift in Sources */,
-			A0000001000000000000000D /* ShortcutRecorderView.swift in Sources */,
-			A0000001000000000000000E /* SettingsView.swift in Sources */,
-		);
-		runOnlyForDeploymentPostprocessing = 0;
-	};
+		A000002000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000010000000000000001 /* texApp.swift in Sources */,
+				A00000010000000000000002 /* AppDelegate.swift in Sources */,
+				A00000010000000000000003 /* AppController.swift in Sources */,
+				A00000010000000000000004 /* TranslationRecord.swift in Sources */,
+				A00000010000000000000005 /* TranslationHistoryStore.swift in Sources */,
+				A00000010000000000000006 /* ScreenCaptureService.swift in Sources */,
+				A00000010000000000000007 /* OCRService.swift in Sources */,
+				A00000010000000000000008 /* HotKeyMonitor.swift in Sources */,
+				A00000010000000000000009 /* TranslationPopupController.swift in Sources */,
+				A0000001000000000000000A /* TranslationWorkerView.swift in Sources */,
+				A0000001000000000000000B /* MenuBarContentView.swift in Sources */,
+				A0000001000000000000000C /* ShortcutPreference.swift in Sources */,
+				A0000001000000000000000D /* ShortcutRecorderView.swift in Sources */,
+				A0000001000000000000000E /* SettingsView.swift in Sources */,
+				A0000001000000000000000F /* GeminiService.swift in Sources */,
+				A00000010000000000000010 /* SecretsStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
@@ -225,6 +235,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = Z9VAMX4ARW;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
@@ -241,6 +252,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Z9VAMX4ARW;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
@@ -255,8 +267,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/dist/$(CONFIGURATION)";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V5W4LV96XX;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = tex/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -267,6 +282,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.raza.tex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
@@ -277,8 +293,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/dist/$(CONFIGURATION)";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V5W4LV96XX;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = tex/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -289,6 +308,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.raza.tex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;

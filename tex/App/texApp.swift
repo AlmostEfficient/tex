@@ -2,6 +2,8 @@ import SwiftUI
 
 @main
 struct texApp: App {
+    private static let settingsWindowID = "settings-window"
+
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var appController = AppController.shared
 
@@ -14,8 +16,11 @@ struct texApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        Settings {
+        Window("Settings", id: Self.settingsWindowID) {
             SettingsView()
+                .environmentObject(appController)
         }
+        .defaultSize(width: 460, height: 360)
+        .windowResizability(.contentSize)
     }
 }
